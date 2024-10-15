@@ -1,6 +1,7 @@
 import React, {useRef} from 'react'
 import logo from '../assets/splash_screen/logo.png'
 import {useNavigate} from "react-router-dom";
+import axios from 'axios';
 
 function LoginPage() {
 
@@ -8,11 +9,21 @@ function LoginPage() {
     const emailRef = useRef(null);
     const passwordRef = useRef(null);
 
-    const handleLogin = ()=>{
-        navigate('/home')
-        console.log(emailRef.current.value)
-        console.log(passwordRef.current.value)
-    }
+    const handleLogin = async () => {
+        const email = emailRef.current.value;
+        const password = passwordRef.current.value;
+
+        try {
+            const response = await axios.post('http://localhost:5000/login', { email, password });
+            console.log('Login successful:', response.data);
+            // Optionally, store the JWT token in local storage
+            localStorage.setItem('token', response.data.token);
+            navigate('/home');  // Redirect to the home page after login
+        } catch (error) {
+            console.error('Login failed:', error.response ? error.response.data : error.message);
+            alert('Invalid credentials. Please try again.');
+        }
+    };
 
     return (
         <div className='w-screen h-screen flex items-center justify-center bg-blue-50'>
